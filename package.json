@@ -1,5 +1,5 @@
 {
-  "name": "money-multiplier-dashboard",
+  "name": "dash",
   "private": true,
   "version": "1.0.0",
   "workspaces": [
@@ -7,10 +7,11 @@
     "backend"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace frontend\" \"npm run dev --workspace backend\"",
-    "build": "npm run build --workspace backend && npm run build --workspace frontend",
-    "test": "npm run test --workspace backend",
-    "typecheck": "npm run typecheck --workspace backend && npm run build --workspace frontend"
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "npm -w frontend run dev",
+    "dev:backend": "npm -w backend run dev",
+    "build": "npm -w frontend run build && npm -w backend run build",
+    "typecheck": "npm -w frontend run typecheck && npm -w backend run typecheck"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

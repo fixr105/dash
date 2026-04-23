@@ -1,9 +1,28 @@
-import { getConfig } from "./core/config/env.js";
-import { createApp } from "./app.js";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import dotenv from "dotenv";
+import express from "express";
+import helmet from "helmet";
 
-const config = getConfig();
-const app = createApp();
+import { apiRouter } from "./routes/index.js";
 
-app.listen(config.port, () => {
-  console.log(`Money Multiplier API running on http://localhost:${config.port}`);
+dotenv.config();
+
+const app = express();
+const port = Number(process.env.PORT ?? 4000);
+
+app.use(helmet());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true
+  })
+);
+app.use(cookieParser());
+app.use(express.json());
+
+app.use("/api", apiRouter);
+
+app.listen(port, () => {
+  console.log(`Dash backend running on http://localhost:${port}`);
 });

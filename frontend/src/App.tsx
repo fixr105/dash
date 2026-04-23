@@ -1,14 +1,16 @@
-import { RouterProvider } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
-import "./App.css";
-import { AppProviders } from "./app/providers";
-import { router } from "./app/router";
+import { appRoutes } from "./config/appRoutes";
 
 function App() {
   return (
-    <AppProviders>
-      <RouterProvider router={router} />
-    </AppProviders>
+    <Routes>
+      {appRoutes.map((route) => {
+        const RouteComponent = route.component;
+        return <Route key={route.path} path={route.path} element={<RouteComponent />} />;
+      })}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
