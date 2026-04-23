@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ApplicationStage {
+  CREATED
+  DOCUMENTS_PENDING
+  UNDERWRITING
+  APPROVED
+  REJECTED
+  DISBURSED
+}
+
+enum EventType {
+  USER_CREATED
+  NBFC_CREATED
+  MEMBERSHIP_CREATED
+  LOAN_APPLICATION_CREATED
+  APPLICATION_STATUS_CHANGED
+  GENERIC
+}
+
+model User {
+  id             String           @id @default(cuid())
+  email          String           @unique
+  name           String?
+  passwordHash   String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  memberships    UserMembership[]
+  applications   LoanApplication[] @relation("LoanApplicationApplicant")
+  createdEvents  Event[]          @relation("EventActor")
+}
+
+enum NbfcStatus {
+  ACTIVE
+  INACTIVE
+}
+
+model Nbfc {
+  id             String           @id @default(cuid())
+  name           String
+  legalEntityName String?
+  status         NbfcStatus       @default(ACTIVE)
+  slug           String?           @unique
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  memberships    UserMembership[]
+  applications   LoanApplication[]
+  events         Event[]
+}
+
+model UserMembership {
+  id             String    @id @default(cuid())
+  userId         String
+  nbfcId         String?
+  scope          String     @default("")
+  role           String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nbfc           Nbfc?     @relation(fields: [nbfcId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, scope])
+  @@index([nbfcId])
+}
+
+model LoanApplication {
+  id                String                    @id @default(cuid())
+  nbfcId            String
+  productModuleKey  String?
+  status            String?
+  assignedNbfcId    String?
+  assignedAt        DateTime?
+  applicantUserId   String
+  externalRef       String?                   @unique
+  amount            Decimal                   @db.Decimal(18, 2)
+  currency          String                    @default("INR")
+  stage             ApplicationStage          @default(CREATED)
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  nbfc              Nbfc                      @relation(fields: [nbfcId], references: [id], onDelete: Cascade)
+  applicantUser     User                      @relation("LoanApplicationApplicant", fields: [applicantUserId], references: [id], onDelete: Restrict)
+  statusHistory     ApplicationStatusHistory[]
+  events            Event[]
+
+  @@index([nbfcId])
+  @@index([assignedNbfcId])
+  @@index([applicantUserId])
+}
+
+model ApplicationStatusHistory {
+  id                String            @id @default(cuid())
+  applicationId     String
+  fromStage         ApplicationStage?
+  toStage           ApplicationStage
+  note              String?
+  changedByUserId   String?
+  changedAt         DateTime          @default(now())
+
+  application       LoanApplication   @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+}
+
+model Event {
+  id                String           @id @default(cuid())
+  nbfcId            String
+  actorUserId       String?
+  loanApplicationId String?
+  type              EventType
+  payload           Json?
+  createdAt         DateTime         @default(now())
+
+  nbfc              Nbfc             @relation(fields: [nbfcId], references: [id], onDelete: Cascade)
+  actorUser         User?            @relation("EventActor", fields: [actorUserId], references: [id], onDelete: SetNull)
+  loanApplication   LoanApplication? @relation(fields: [loanApplicationId], references: [id], onDelete: SetNull)
+
+  @@index([nbfcId, createdAt])
+  @@index([loanApplicationId])
+}
