@@ -141,3 +141,43 @@ model Event {
   @@index([loanApplicationId])
   @@schema("shared")
 }
+
+enum ToolJobType {
+  RAAD
+  PAGER
+  QUERY_DRAFTER
+
+  @@schema("lending")
+}
+
+enum ToolJobStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+
+  @@schema("lending")
+}
+
+model ToolJob {
+  id                String        @id @default(cuid())
+  nbfcId            String
+  createdByUserId   String
+  tool              ToolJobType
+  status            ToolJobStatus @default(QUEUED)
+  loanApplicationId String?
+  input             Json          @default("{}")
+  output            Json?
+  error             String?
+  n8nExecutionId    String?
+  reportUrl         String?
+  draftedQuery      String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  completedAt       DateTime?
+
+  @@index([nbfcId, createdAt])
+  @@index([status])
+  @@map("tool_jobs")
+  @@schema("lending")
+}
