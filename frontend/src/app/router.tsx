@@ -1,6 +1,9 @@
 import { Navigate, createBrowserRouter } from "react-router-dom";
 
+import { LoginPage } from "../auth/LoginPage";
+import { RequireAuth } from "../auth/RequireAuth";
 import { AppShell } from "./layout/AppShell";
+import { AppProviders } from "./providers";
 import { CashflowPage } from "../features/analytics/CashflowPage";
 import { DecisionsPage } from "../features/analytics/DecisionsPage";
 import { LiquidityPage } from "../features/analytics/LiquidityPage";
@@ -11,10 +14,24 @@ import { ClientsPage } from "../features/clients/ClientsPage";
 import { DashboardPage } from "../features/dashboard/DashboardPage";
 import { TransactionsPage } from "../features/transactions/TransactionsPage";
 
+function ProtectedLayout() {
+  return (
+    <RequireAuth>
+      <AppProviders>
+        <AppShell />
+      </AppProviders>
+    </RequireAuth>
+  );
+}
+
 export const router = createBrowserRouter([
   {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
     path: "/",
-    element: <AppShell />,
+    element: <ProtectedLayout />,
     children: [
       { index: true, element: <Navigate replace to="/dashboard" /> },
       { path: "dashboard", element: <DashboardPage /> },

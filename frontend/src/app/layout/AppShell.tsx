@@ -1,5 +1,6 @@
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 
+import { useAuth } from "../../auth/useAuth";
 import { useDashboardContext } from "../providers";
 
 const navItems = [
@@ -22,9 +23,16 @@ const themeOptions = [
 
 export function AppShell() {
   const { data, error, loading, refresh, setTheme, theme } = useDashboardContext();
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
   const location = useLocation();
   const activeNav = navItems.find((item) => location.pathname.startsWith(item.path)) ?? navItems[0];
   const status = data.dashboard?.portfolio.status ?? "healthy";
+
+  async function handleLogout() {
+    await logout();
+    navigate("/login", { replace: true });
+  }
 
   return (
     <div className="app-shell">
@@ -73,9 +81,13 @@ export function AppShell() {
           </div>
 
           <div className="topbar__actions">
+            <span className="pill">{user?.email ?? "Signed in"}</span>
             <span className={`status-badge status-badge--${status}`}>{status.replace("-", " ")}</span>
             <button className="ghost-button" onClick={() => void refresh()} type="button">
               Refresh data
+            </button>
+            <button className="ghost-button" onClick={() => void handleLogout()} type="button">
+              Logout
             </button>
           </div>
         </header>

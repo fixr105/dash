@@ -345,3 +345,61 @@ td small {
     flex-direction: column;
   }
 }
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #f3f4f6;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 28rem;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.auth-wordmark {
+  margin: 0;
+  color: #332f78;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.auth-card h1 {
+  margin: 8px 0 0;
+}
+
+.auth-subtitle {
+  margin: 4px 0 0;
+  color: #6b7280;
+}
+
+.auth-form {
+  margin-top: 18px;
+  display: grid;
+  gap: 14px;
+}
+
+.auth-submit {
+  background: #332f78;
+  border-color: #332f78;
+}
+
+.auth-submit:hover {
+  background: #2a265f;
+}
+
+.auth-error {
+  margin: 0;
+  color: #dc2626;
+  font-size: 0.9rem;
+}

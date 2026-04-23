@@ -1,14 +1,14 @@
 import { RouterProvider } from "react-router-dom";
 
 import "./App.css";
-import { AppProviders } from "./app/providers";
+import { AuthProvider } from "./auth/AuthContext";
 import { router } from "./app/router";
 
 function App() {
   return (
-    <AppProviders>
+    <AuthProvider>
       <RouterProvider router={router} />
-    </AppProviders>
+    </AuthProvider>
   );
 }
 
