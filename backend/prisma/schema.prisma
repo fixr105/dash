@@ -5,6 +5,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["shared", "origination", "lending"]
 }
 
 enum ApplicationStage {
@@ -14,6 +15,8 @@ enum ApplicationStage {
   APPROVED
   REJECTED
   DISBURSED
+
+  @@schema("shared")
 }
 
 enum EventType {
@@ -23,6 +26,8 @@ enum EventType {
   LOAN_APPLICATION_CREATED
   APPLICATION_STATUS_CHANGED
   GENERIC
+
+  @@schema("shared")
 }
 
 model User {
@@ -35,11 +40,15 @@ model User {
   memberships    UserMembership[]
   applications   LoanApplication[] @relation("LoanApplicationApplicant")
   createdEvents  Event[]          @relation("EventActor")
+
+  @@schema("shared")
 }
 
 enum NbfcStatus {
   ACTIVE
   INACTIVE
+
+  @@schema("shared")
 }
 
 model Nbfc {
@@ -53,6 +62,8 @@ model Nbfc {
   memberships    UserMembership[]
   applications   LoanApplication[]
   events         Event[]
+
+  @@schema("shared")
 }
 
 model UserMembership {
@@ -69,6 +80,7 @@ model UserMembership {
 
   @@unique([userId, scope])
   @@index([nbfcId])
+  @@schema("shared")
 }
 
 model LoanApplication {
@@ -94,6 +106,7 @@ model LoanApplication {
   @@index([nbfcId])
   @@index([assignedNbfcId])
   @@index([applicantUserId])
+  @@schema("shared")
 }
 
 model ApplicationStatusHistory {
@@ -108,6 +121,7 @@ model ApplicationStatusHistory {
   application       LoanApplication   @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 
   @@index([applicationId])
+  @@schema("shared")
 }
 
 model Event {
@@ -125,4 +139,5 @@ model Event {
 
   @@index([nbfcId, createdAt])
   @@index([loanApplicationId])
+  @@schema("shared")
 }
