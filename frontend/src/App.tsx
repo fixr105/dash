@@ -6,6 +6,7 @@ import { RequireAuth } from "./auth/RequireAuth";
 import { AuthProvider } from "./auth/AuthContext";
 import { useAuth } from "./auth/useAuth";
 import { AppShell } from "./components/layout/AppShell";
+import { ApplicationDetailPage } from "./pages/ApplicationDetail";
 import { InboxPage } from "./pages/Inbox";
 
 function HomeRedirect() {
@@ -52,7 +53,7 @@ const router = createBrowserRouter([
       { path: "tools", element: <ComingSoonCard title="Tools" /> },
       { path: "settings", element: <ComingSoonCard title="Settings" /> },
       { path: "admin", element: <ComingSoonCard title="Dashboard" /> },
-      { path: "applications/:id", element: <ComingSoonCard title="Application detail" /> },
+      { path: "applications/:id", element: <ApplicationDetailPage /> },
     ],
   },
 ]);

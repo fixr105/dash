@@ -50,3 +50,57 @@ inboxRouter.get("/", requireAuth, requireNbfcScope, async (req, res) => {
     nextCursor: hasMore ? page[page.length - 1]?.id ?? null : null,
   });
 });
+
+inboxRouter.get("/:id", requireAuth, requireNbfcScope, async (req, res) => {
+  const application = await prisma.loanApplication.findFirst({
+    where: {
+      id: req.params.id,
+      assignedNbfcId: req.nbfcId,
+    },
+    include: {
+      applicantUser: {
+        select: {
+          name: true,
+          email: true,
+        },
+      },
+      statusHistory: {
+        orderBy: {
+          changedAt: "desc",
+        },
+      },
+    },
+  });
+
+  if (!application) {
+    res.status(404).json({ error: "Application not found." });
+    return;
+  }
+
+  res.json({
+    application: {
+      id: application.id,
+      externalRef: application.externalRef,
+      productModuleKey: application.productModuleKey,
+      status: application.status,
+      stage: application.stage,
+      amount: application.amount.toString(),
+      currency: application.currency,
+      assignedAt: application.assignedAt,
+      createdAt: application.createdAt,
+      metadata: {
+        clientName: application.applicantUser.name ?? null,
+        borrowerName: application.applicantUser.name ?? null,
+        notes: null,
+        documents: [],
+      },
+    },
+    statusHistory: application.statusHistory.map((history) => ({
+      id: history.id,
+      fromStage: history.fromStage,
+      toStage: history.toStage,
+      note: history.note,
+      changedAt: history.changedAt,
+    })),
+  });
+});
